@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id          String        @id @default(uuid())
+  Username    String        @unique
+  Password    String
+  Email       String
+  Total_score Int
+  Biodata     String
+  City        String
+  history     historyGame[]
+}
+
+model game {
+  id            String @id @default(uuid())
+  Name          String @unique
+  Description   String
+  thumbnail_url String
+  Game_url      String
+  play_count    Int
+}
+
+model historyGame {
+  id           String     @id @default(uuid())
+  result_game  gameResult
+  recent_game  String
+  recent_score Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  user         user?      @relation(fields: [user_id], references: [id])
+  user_id      String?
+}
+
+enum gameResult {
+  WIN
+  LOSE
+  DRAW
+}
