@@ -15,6 +15,7 @@ app.use(cookieParser());
 app.use(handleCors);
 app.use(express.static("public"));
 app.use(flash());
+
 app.get("/", (req, res) => {
   res.json({ message: "api running !!" });
 });
