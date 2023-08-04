@@ -1,8 +1,11 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('@prisma/client');
+
 const prisma = new PrismaClient();
 
 const createRoom = async (req, res) => {
-  const { Name, Description, thumbnail_url, Game_url, play_count } = req.body;
+  const {
+    Name, Description, thumbnail_url, Game_url, play_count,
+  } = req.body;
 
   try {
     const room = await prisma.game.create({
@@ -16,11 +19,11 @@ const createRoom = async (req, res) => {
     });
     if (!room) {
       return res.status(401).json({
-        message: "cannot be empty",
+        message: 'cannot be empty',
       });
     }
     res.status(202).json({
-      message: "success create room ",
+      message: 'success create room ',
       data: room,
     });
   } catch (error) {
@@ -34,14 +37,14 @@ async function getRooms(req, res, next) {
     const rooms = await prisma.game.findMany();
     if (rooms) {
       return res.status(200).json({
-        result: "Success",
+        result: 'Success',
         rooms,
       });
     }
     if (!rooms) {
       return res.status(400).json({
-        result: "error",
-        message: "Tidak ada rooms",
+        result: 'error',
+        message: 'Tidak ada rooms',
       });
     }
   } catch (error) {
@@ -57,10 +60,10 @@ async function getRoomById(req, res, next) {
     });
     if (!games) {
       return res.status(400).json({
-        result: "room not found!",
+        result: 'room not found!',
       });
     }
-    res.status(200).json({ message: "success get room by id", data: games });
+    res.status(200).json({ message: 'success get room by id', data: games });
   } catch (error) {
     next(error);
   }
@@ -85,7 +88,7 @@ const updateScore = async (req, res) => {
     });
     res
       .status(200)
-      .json({ msg: "success update rooms !", data: data.play_count });
+      .json({ msg: 'success update rooms !', data: data.play_count });
   } catch (error) {
     console.log(error.message);
   }
@@ -99,7 +102,7 @@ const bulkCreateGames = () => {
 const deleteAllGames = async (req, res) => {
   try {
     const deletAll = await prisma.game.deleteMany({});
-    res.status(200).json({ msg: "sucess delete all" });
+    res.status(200).json({ msg: 'sucess delete all' });
   } catch (error) {
     console.log(error);
   }
@@ -107,7 +110,7 @@ const deleteAllGames = async (req, res) => {
 const bulkCreate = async (req, res) => {
   try {
     const create = await prisma.game.createMany({});
-    res.status(200).json({ msg: "data created 10" });
+    res.status(200).json({ msg: 'data created 10' });
   } catch (error) {
     console.log(error);
   }
