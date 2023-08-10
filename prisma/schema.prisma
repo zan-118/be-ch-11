@@ -9,12 +9,13 @@ datasource db {
 
 model user {
   id          String        @id @default(uuid())
+  Email       String
   Username    String        @unique
   Password    String
-  Email       String
-  Total_score Int
   Biodata     String
   City        String
+  Total_score Int
+  image_url   String?
   history     historyGame[]
 }
 
@@ -29,13 +30,13 @@ model game {
 
 model historyGame {
   id           String     @id @default(uuid())
-  result_game  gameResult
-  recent_game  String
   recent_score Int
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
-  user         user?      @relation(fields: [user_id], references: [id])
   user_id      String?
+  result_game  gameResult
+  recent_game  String
+  user         user?      @relation(fields: [user_id], references: [id])
 }
 
 enum gameResult {
