@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+
 const prisma = new PrismaClient();
 
 const createRoom = async (req, res) => {
@@ -14,41 +15,38 @@ const createRoom = async (req, res) => {
         play_count,
       },
     });
+
     if (!room) {
       return res.status(401).json({
         message: "cannot be empty",
       });
     }
-    res.status(202).json({
+    return res.status(202).json({
       message: "success create room ",
       data: room,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
-// 1. fungsi get room labib
 async function getRooms(req, res, next) {
   try {
     const rooms = await prisma.game.findMany();
-    if (rooms) {
-      return res.status(200).json({
-        result: "Success",
-        rooms,
-      });
-    }
     if (!rooms) {
       return res.status(400).json({
         result: "error",
         message: "Tidak ada rooms",
       });
     }
+    return res.status(200).json({
+      result: "Success",
+      rooms,
+    });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 }
-// 2. fungsi get room berdasarkan id
 async function getRoomById(req, res, next) {
   const { id } = req.params;
   try {
@@ -60,9 +58,11 @@ async function getRoomById(req, res, next) {
         result: "room not found!",
       });
     }
-    res.status(200).json({ message: "success get room by id", data: games });
+    return res
+      .status(200)
+      .json({ message: "success get room by id", data: games });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 }
 
@@ -74,6 +74,7 @@ const updateScore = async (req, res) => {
         id,
       },
     });
+    // eslint-disable-next-line no-plusplus
     const visitedRoom = ++getData.play_count;
     const data = await prisma.game.update({
       where: {
@@ -91,27 +92,27 @@ const updateScore = async (req, res) => {
   }
 };
 
-const bulkCreateGames = () => {
-  try {
-  } catch (error) {}
-};
+// const bulkCreateGames = () => {
+//   try {
+//   } catch (error) {}
+// };
 
-const deleteAllGames = async (req, res) => {
-  try {
-    const deletAll = await prisma.game.deleteMany({});
-    res.status(200).json({ msg: "sucess delete all" });
-  } catch (error) {
-    console.log(error);
-  }
-};
-const bulkCreate = async (req, res) => {
-  try {
-    const create = await prisma.game.createMany({});
-    res.status(200).json({ msg: "data created 10" });
-  } catch (error) {
-    console.log(error);
-  }
-};
+// const deleteAllGames = async (req, res) => {
+//   try {
+//     const deletAll = await prisma.game.deleteMany({});
+//     res.status(200).json({ msg: "sucess delete all" });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+// const bulkCreate = async (req, res) => {
+//   try {
+//     const create = await prisma.game.createMany({});
+//     res.status(200).json({ msg: "data created 10" });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 module.exports = {
   createRoom,
   getRooms,

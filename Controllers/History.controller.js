@@ -1,6 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
 
+const prisma = new PrismaClient();
 const postHistory = async (req, res) => {
   const { user_id, result_game, recent_game, recent_score } = req.body;
 
@@ -21,7 +21,7 @@ const postHistory = async (req, res) => {
         },
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       meta: {
         code: "200_002",
         message: "success create data",
@@ -29,7 +29,7 @@ const postHistory = async (req, res) => {
       data: create,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       meta: {
         code: "400_002",
         message: error.message,
@@ -41,12 +41,12 @@ const postHistory = async (req, res) => {
 const getHistory = async (req, res) => {
   const { user_id } = req.param;
   try {
-    const getHistory = await prisma.historyGame.findMany({
+    const history = await prisma.historyGame.findMany({
       where: {
         user_id,
       },
     });
-    if (!getHistory) {
+    if (!history) {
       return res.status(400).json({
         meta: {
           code: "400_002",
@@ -54,12 +54,12 @@ const getHistory = async (req, res) => {
         },
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       meta: {
         code: "200_003",
         message: "succes get data history id",
       },
-      data: getHistory,
+      data: history,
     });
   } catch (error) {
     return res.status(500).json({

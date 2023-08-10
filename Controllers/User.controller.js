@@ -1,12 +1,15 @@
+/* eslint-disable operator-linebreak */
 const { PrismaClient } = require("@prisma/client");
+
 const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
 
-// 1. fungsi create player / register - vincent
 const register = async (req, res) => {
-  const { Email, Username, Password, Total_score, Biodata, City } = req.body;
+  const { Email, Username, Password, Total_score, Biodata, City, image_url } =
+    req.body;
   try {
     const hashedPassword = await bcrypt.hash(Password, 12);
+    // eslint-disable-next-line no-unused-vars
     const player = await prisma.user.create({
       data: {
         Email,
@@ -15,6 +18,7 @@ const register = async (req, res) => {
         Total_score,
         Biodata,
         City,
+        image_url,
       },
     });
     // validasi body kosong
@@ -30,15 +34,14 @@ const register = async (req, res) => {
         message: "password cannot be empty",
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       message: "success create data !",
     });
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    return res.status(500).json({ msg: error.message });
   }
 };
 
-// 2. fungsi get player - auda
 async function getPlayers(req, res, next) {
   try {
     const players = await prisma.user.findMany();
@@ -49,15 +52,15 @@ async function getPlayers(req, res, next) {
         message: "Tidak ada data",
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       result: "Success",
       payload: players,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 }
-// 3. fungsi get player berdasarkan id - adan
+
 async function getPlayerById(req, res, next) {
   const { id } = req.params;
   try {
@@ -69,19 +72,19 @@ async function getPlayerById(req, res, next) {
         result: "users not found!",
       });
     }
-    res
+    return res
       .status(200)
       .json({ message: "success get player by id", data: players });
   } catch (error) {
-    next(error); // notes res.status(500)
+    return next(error); // notes res.status(500)
   }
 }
-// 4. fungsi update player - akmal
-async function updatePlayer(req, res, next) {
+
+async function updatePlayer(req, res) {
   try {
     const { id } = req.params;
-    const { Email, Username, Password, Total_score, Biodata, City } = req.body;
-    //pastiin data yang dikirim objek/
+    const { Email, Username, Total_score, Biodata, City } = req.body;
+    // pastiin data yang dikirim objek/
     const updateData = await prisma.user.update({
       where: { id },
       data: {
@@ -103,13 +106,34 @@ async function updatePlayer(req, res, next) {
   }
 }
 
-// 5, fungsi delete player - labib
-async function deletePlayer(req, res, next) {
+async function updateImage(req, res) {
+  const { id } = req.params;
+  try {
+    const { image_url } = req.body;
+    const update = await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        image_url,
+      },
+    });
+    res
+      .status(200)
+      .json({ message: "success change profile picture", data: update });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+}
+
+async function deletePlayer(req, res) {
   const { id } = req.params;
   try {
     const players = await prisma.user.delete({
       where: {
-        id: +id, //parsing string to number
+        id: +id, // parsing string to number
       },
     });
     if (!players) {
@@ -127,4 +151,5 @@ module.exports = {
   deletePlayer,
   getPlayerById,
   register,
+  updateImage,
 };
