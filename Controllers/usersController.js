@@ -1,9 +1,9 @@
 const { PrismaClient } = require('@prisma/client');
-
 const prisma = new PrismaClient();
 const { hashPassword } = require('../utils/passwordHandler');
 const ClientError = require('../exceptions/ClientError');
 const autoBind = require('auto-bind');
+const { validateUserPayload } = require('../validator/users');
 
 class UserController {
   constructor() {
@@ -12,26 +12,27 @@ class UserController {
   
   static async postUsersHandler(req, res) {
     const {
-      Username, Password, Email, Total_score, Biodata, City,
+      Username, Password, Email, Total_score, Biodata, City
     } = req.body;
     try {
+      validateUserPayload(req.body)
       const hashedPassword = await hashPassword(Password);
       console.log(hashedPassword);
 
-      const newUser = {
-        Email,
-        Username,
-        Password: hashedPassword,
-        Total_score,
-        Biodata,
-        City,
-      };
-      console.log(newUser);
+      const newUser = await prisma.user.create({
+        data: {
+          Username,
+          Password: hashedPassword,
+          Email,
+          Total_score,
+          Biodata,
+          City,
+        }
+      });
 
-      const createdUser = await prisma.user.create(newUser);
       return res.status(200).json({
         message: 'Success create data!',
-        data: createdUser,
+        data: newUser,
       });
     } catch (error) {
       if (error instanceof ClientError) {
