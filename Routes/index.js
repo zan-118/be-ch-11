@@ -2,7 +2,7 @@ const app = require('express');
 const GameRouter = require('./game.js');
 const PlayerRouter = require('./player.js');
 const History = require('./history.js');
-const LoginUserHandler = require('../Controllers/Login.controller.js');
+const LoginUserHandler = require('../Controllers/loginController.js');
 
 const router = app.Router();
 

@@ -1,5 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
-const { verifyPassword } = require("../../utils/passwordHandler");
+const { verifyPassword } = require('../utils/passwordHandler');
 const prisma = new PrismaClient();
 const jwt = require('jsonwebtoken');
 const { validateLoginPayload } = require('../validator/login/index');

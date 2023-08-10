@@ -1,10 +1,15 @@
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
-const { hashPassword, verifyPassword } = require('../utils/passwordHandler');
+const { hashPassword } = require('../utils/passwordHandler');
 const ClientError = require('../exceptions/ClientError');
+const autoBind = require('auto-bind');
 
 class UserController {
+  constructor() {
+    autoBind(this)
+  }
+  
   static async postUsersHandler(req, res) {
     const {
       Username, Password, Email, Total_score, Biodata, City,
@@ -82,7 +87,7 @@ class UserController {
     }
   }
 
-  static async updateUserHandler(req, res) {
+  static async putUserHandler(req, res) {
     const { id } = req.params;
     const {
       Username, Password, Email, Total_score, Biodata, City,
