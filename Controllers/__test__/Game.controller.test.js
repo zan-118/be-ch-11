@@ -2,7 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const {
   createRoom,
   getRooms,
-} = require('../Game.controller'); // Ubah sesuai dengan path file Anda
+} = require('../Game.controller');
 
 jest.mock("@prisma/client");
 

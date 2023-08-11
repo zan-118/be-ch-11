@@ -37,12 +37,58 @@ describe("Authorization Middleware", () => {
   });
 
   it("should return 403 for an invalid token", () => {
-    // Similar approach to the valid token test, but with invalid token
-    // ...
+    const mockToken = "invalid.token.value";
+    const mockReq = {
+      headers: {
+        authorization: `Bearer ${mockToken}`,
+      },
+    };
+    const mockRes = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+    };
+    const mockNext = jest.fn();
+
+    // Mock the verify function
+    jwt.verify.mockImplementation((token, secret, callback) => {
+      if (token === mockToken && secret === process.env.TOKEN) {
+        const mockUser = { id: 123, username: "testuser" };
+        callback(null, mockUser);
+      } else {
+        callback(new Error("Invalid token"));
+      }
+    });
+
+    // Call the authOnly middleware
+    authOnly(mockReq, mockRes, mockNext);
+
+    // Assert that the mockNext function was called
+    expect(mockNext).not.toHaveBeenCalled();
+
+    // Assert that res.status and res.send were called with 403
+    expect(mockRes.status).toHaveBeenCalledWith(403);
+    expect(mockRes.send).toHaveBeenCalledWith("Forbidden");
   });
 
+  // Handle missing authorization header scenario
   it("should return 401 for missing authorization header", () => {
-    // Similar approach, but mockReq doesn't have headers.authorization
-    // ...
+    const mockReq = {
+      headers: {}, // No authorization header
+    };
+    const mockRes = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+    };
+    const mockNext = jest.fn();
+
+    // Call the authOnly middleware
+    authOnly(mockReq, mockRes, mockNext);
+
+    // Assert that the mockNext function was not called
+    expect(mockNext).not.toHaveBeenCalled();
+
+    // Assert that res.status and res.send were called with 401
+    expect(mockRes.status).toHaveBeenCalledWith(401);
+    expect(mockRes.send).toHaveBeenCalledWith("Unauthorized");
   });
 });
