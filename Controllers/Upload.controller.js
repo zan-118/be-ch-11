@@ -30,7 +30,9 @@ const uploadImage = async (req, res) => {
         },
       });
 
-      return res.status(200).json({ message: "upload success", update });
+      return res
+        .status(200)
+        .json({ message: "upload success", data: update.image_url });
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
