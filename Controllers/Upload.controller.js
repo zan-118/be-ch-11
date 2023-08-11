@@ -21,7 +21,6 @@ const uploadImage = async (req, res) => {
         console.error("Error uploading to Cloudinary:", err);
         return res.status(500).json({ message: "Error uploading file" });
       }
-      console.log(result.secure_url);
       const update = await prisma.user.update({
         where: {
           id,
