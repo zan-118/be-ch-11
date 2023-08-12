@@ -14,7 +14,8 @@
     "no-console": "off",
     "camelcase": "off",
     "quotes": "off",
-    "object-curly-newline": "off"
+    "object-curly-newline": "off",
+    "no-trailing-spaces": "off"
   }
   // "import/no-extraneous-dependencies": ["error", {"devDependencies": false, "optionalDependencies": false, "peerDependencies": false}]
 }

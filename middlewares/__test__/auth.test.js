@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const authOnly = require("../auth"); 
+const authOnly = require("../auth"); // Assuming the script is in a file named authOnly.js
 
 // Mock the jsonwebtoken module
 jest.mock("jsonwebtoken");
@@ -8,7 +8,11 @@ describe("Authorization Middleware", () => {
   it("should pass with a valid token", () => {
     // Mock the necessary objects
     const mockToken = "mocked.token.value";
-    const mockUser = { id: 123, username: "testuser" };
+
+    const mockUser = {
+      id: "5d64bbf0-b7d8-4c76-a4ce-9cb157d1f52c",
+      username: "admin",
+    };
     const mockReq = {
       headers: {
         authorization: `Bearer ${mockToken}`,
@@ -45,39 +49,36 @@ describe("Authorization Middleware", () => {
     };
     const mockRes = {
       status: jest.fn().mockReturnThis(),
-      send: jest.fn(),
+      json: jest.fn(),
     };
     const mockNext = jest.fn();
 
     // Mock the verify function
     jwt.verify.mockImplementation((token, secret, callback) => {
-      if (token === mockToken && secret === process.env.TOKEN) {
-        const mockUser = { id: 123, username: "testuser" };
-        callback(null, mockUser);
-      } else {
-        callback(new Error("Invalid token"));
-      }
+      callback(new Error("Invalid token"));
     });
 
     // Call the authOnly middleware
     authOnly(mockReq, mockRes, mockNext);
 
-    // Assert that the mockNext function was called
+    // Assert that the mockNext function was not called
     expect(mockNext).not.toHaveBeenCalled();
 
-    // Assert that res.status and res.send were called with 403
+    // Assert that res.status and res.json were called with 403
     expect(mockRes.status).toHaveBeenCalledWith(403);
-    expect(mockRes.send).toHaveBeenCalledWith("Forbidden");
+    expect(mockRes.json).toHaveBeenCalledWith({
+      auth: false,
+      message: "forbidden",
+    });
   });
 
-  // Handle missing authorization header scenario
   it("should return 401 for missing authorization header", () => {
     const mockReq = {
       headers: {}, // No authorization header
     };
     const mockRes = {
       status: jest.fn().mockReturnThis(),
-      send: jest.fn(),
+      json: jest.fn(),
     };
     const mockNext = jest.fn();
 
@@ -87,8 +88,11 @@ describe("Authorization Middleware", () => {
     // Assert that the mockNext function was not called
     expect(mockNext).not.toHaveBeenCalled();
 
-    // Assert that res.status and res.send were called with 401
+    // Assert that res.status and res.json were called with 401
     expect(mockRes.status).toHaveBeenCalledWith(401);
-    expect(mockRes.send).toHaveBeenCalledWith("Unauthorized");
+    expect(mockRes.json).toHaveBeenCalledWith({
+      auth: false,
+      message: "Unauthorized",
+    });
   });
 });
