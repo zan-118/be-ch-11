@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const authOnly = require("../auth"); // Assuming your module is in a file named authOnly.js
+const authOnly = require("../auth"); 
 
 // Mock the jsonwebtoken module
 jest.mock("jsonwebtoken");

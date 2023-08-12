@@ -1,60 +1,64 @@
 const multer = require("multer");
-const upload = require("../upload"); // Assuming your module is in a file named upload.js
+const upload = require("../upload"); 
 
-// Mock the multer module
 jest.mock("multer");
 
-describe("File Upload Middleware", () => {
-  // Mock the diskStorage function
-  multer.diskStorage.mockImplementation((options) => {
-    const { destination, filename } = options;
-
-    return {
-      destination: jest.fn((req, file, cb) => {
-        cb(null, destination);
-      }),
-      filename: jest.fn((req, file, cb) => {
-        cb(null, filename(req, file));
-      }),
-    };
+describe("upload", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  // Mock the fileFilter function
-  const mockFileFilter = jest.fn((req, file, cb) => {
-    cb(null, true);
+  it("should export the upload middleware function", () => {
+    expect(typeof upload).toBe("function");
   });
 
-  multer.mockReturnValue({
-    diskStorage: multer.diskStorage,
-    fileFilter: mockFileFilter,
+  it("should set the correct destination for uploaded files", () => {
+    upload();
+
+    const storageOptions = multer.mock.calls[0][0].storage;
+    const destinationMock = jest.fn();
+    storageOptions.destination(null, null, destinationMock);
+
+    expect(destinationMock).toHaveBeenCalledWith(null, "uploads/");
   });
 
-  // Your test cases here
-  it("should upload a file successfully", () => {
-    // Mock the necessary objects
-    const mockReq = {};
-    const mockFile = {
-      mimetype: "image/jpeg",
-      fieldname: "avatar",
-    };
-    const mockCb = jest.fn();
+  it("should generate unique filenames for uploaded files", () => {
+    upload();
 
-    // Call the fileFilter function
-    mockFileFilter(mockReq, mockFile, mockCb);
+    const storageOptions = multer.mock.calls[0][0].storage;
+    const filenameMock = jest.fn();
+    const fakeFile = { fieldname: "test-fieldname" };
+    storageOptions.filename(null, fakeFile, filenameMock);
 
-    // Assert that the callback was called with no error and true
-    expect(mockCb).toHaveBeenCalledWith(null, true);
-
-    // You can also test the diskStorage behavior similarly
-    // ...
-
-    // Example: Test the actual upload middleware
-    // const middleware = upload.single("avatar");
-    // ...
+    // Check if the generated filename contains the expected fieldname
+    expect(filenameMock).toHaveBeenCalledWith(
+      null,
+      expect.stringContaining("test-fieldname")
+    );
   });
 
-  it("should reject non-image files", () => {
-    // Similar approach to testing fileFilter for rejecting non-image files
-    // ...
+  it("should limit the file size to 5 MB", () => {
+    upload();
+
+    const limits = multer.mock.calls[0][0].limits;
+    expect(limits.fileSize).toBe(1024 * 1024 * 5);
+  });
+
+  it("should allow only image files", () => {
+    upload();
+
+    const fileFilter = multer.mock.calls[0][0].fileFilter;
+    const allowedFile = { mimetype: "image/png" };
+    const disallowedFile = { mimetype: "application/pdf" };
+    const allowMock = jest.fn();
+    const disallowMock = jest.fn();
+
+    fileFilter(null, allowedFile, allowMock);
+    fileFilter(null, disallowedFile, disallowMock);
+
+    expect(allowMock).toHaveBeenCalledWith(null, true);
+    expect(disallowMock).toHaveBeenCalledWith(
+      new Error("Only image files are allowed.")
+    );
   });
 });

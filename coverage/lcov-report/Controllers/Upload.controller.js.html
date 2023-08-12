@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">53.84% </span>
+                <span class="strong">41.17% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>7/13</span>
+                <span class='fraction'>7/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">25% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/4</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">53.84% </span>
+                <span class="strong">41.17% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>7/13</span>
+                <span class='fraction'>7/17</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -93,9 +93,22 @@
 <a name='L28'></a><a href='#L28'>28</a>
 <a name='L29'></a><a href='#L29'>29</a>
 <a name='L30'></a><a href='#L30'>30</a>
-<a name='L31'></a><a href='#L31'>31</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -104,18 +117,25 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -124,8 +144,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// eslint-disable-next-line import/no-extraneous-dependencies
+/* eslint-disable operator-linebreak */
 const cloudinary = require("cloudinary").v2;
+const { PrismaClient } = require("@prisma/client");
 &nbsp;
+const prisma = new PrismaClient();
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
@@ -133,19 +156,26 @@ cloudinary.config({
 });
 &nbsp;
 const uploadImage = async (req, res) =&gt; {
-  try {
-    <span class="missing-if-branch" title="else path not taken" >E</span>if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
+  const { id } = req.params;
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    if (!req.file) {</span>
+<span class="cstat-no" title="statement not covered" >      return res.status(400).json({ message: "No file uploaded" });</span>
     }
-<span class="cstat-no" title="statement not covered" >    return cloudinary.uploader.upload(req.file.path, <span class="fstat-no" title="function not covered" >(e</span>rr, result) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    return cloudinary.uploader.upload(req.file.path, <span class="fstat-no" title="function not covered" >as</span>ync (err, result) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      if (err) {</span>
 <span class="cstat-no" title="statement not covered" >        console.error("Error uploading to Cloudinary:", err);</span>
 <span class="cstat-no" title="statement not covered" >        return res.status(500).json({ message: "Error uploading file" });</span>
       }
-<span class="cstat-no" title="statement not covered" >      return res.status(200).json({</span>
-        message: "upload success !",
-        imageUrl: result,
+      const update = <span class="cstat-no" title="statement not covered" >await prisma.user.update({</span>
+        where: {
+          id,
+        },
+        data: {
+          image_url: result.secure_url,
+        },
       });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      return res.status(200).json({ message: "upload success", data: update });</span>
     });
   } catch (error) {
 <span class="cstat-no" title="statement not covered" >    return res.status(500).json({ message: error.message });</span>
@@ -160,7 +190,7 @@ module.exports = { uploadImage };
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-08-11T14:53:41.570Z
+                at 2023-08-12T08:47:45.210Z
             </div>
         <script src="../prettify.js"></script>
         <script>

@@ -1,28 +1,16 @@
+const { postHistory, getHistory } = require('../History.controller'); // Update the path accordingly
 const { PrismaClient } = require('@prisma/client');
-const historyController = require('../History.controller');
 
-// Mock PrismaClient
-jest.mock('@prisma/client', () => ({
-  PrismaClient: jest.fn(() => ({
-    historyGame: {
-      create: jest.fn(),
-      findMany: jest.fn(),
-    },
-  })),
-}));
+jest.mock('@prisma/client');
 
-describe('History Controller', () => {
-  let prisma;
+describe('postHistory function', () => {
+  let mockPrisma;
+  let req;
+  let res;
+
   beforeEach(() => {
-    prisma = new PrismaClient();
-  });
-
-  // Test postHistory function
-  it('should post a new game history', async () => {
-    // Mock prisma.historyGame.create
-    prisma.historyGame.create.mockResolvedValue({});
-
-    const req = {
+    mockPrisma = new PrismaClient();
+    req = {
       body: {
         user_id: 1,
         result_game: 'win',
@@ -30,14 +18,22 @@ describe('History Controller', () => {
         recent_score: 100,
       },
     };
-    const res = {
-      status: jest.fn().mockReturnThis(),
+    res = {
+      status: jest.fn(() => res),
       json: jest.fn(),
     };
+  });
 
-    await historyController.postHistory(req, res);
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-    expect(prisma.historyGame.create).toHaveBeenCalledWith({
+  it('should create history and return success response', async () => {
+    mockPrisma.historyGame.create.mockResolvedValue({ /* mocked created history data */ });
+
+    await postHistory(req, res);
+
+    expect(mockPrisma.historyGame.create).toHaveBeenCalledWith({
       data: {
         user_id: 1,
         result_game: 'win',
@@ -46,60 +42,105 @@ describe('History Controller', () => {
       },
     });
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({
-      meta: {
-        code: '200_002',
-        message: 'success create data',
-      },
-      data: {},
-    });
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      meta: { code: '200_002', message: 'success create data' },
+      data: expect.any(Object),
+    }));
   });
 
-  // Test getHistory function
-  it('should get game history for a user', async () => {
-    // Mock prisma.historyGame.findMany
-    prisma.historyGame.findMany.mockResolvedValue([
-      {
-        id: 1,
-        user_id: 1,
-        result_game: 'win',
-        recent_game: 'Chess',
-        recent_score: 100,
-      },
-    ]);
+  it('should return error response if history creation fails', async () => {
+    mockPrisma.historyGame.create.mockRejectedValue(new Error('Database error'));
 
-    const req = {
+    await postHistory(req, res);
+
+    expect(mockPrisma.historyGame.create).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      meta: { code: '500_002', message: 'Database error' },
+    }));
+  });
+});
+
+describe('getHistory function', () => {
+  let mockPrisma;
+  let req;
+  let res;
+
+  beforeEach(() => {
+    mockPrisma = new PrismaClient();
+    req = {
       params: {
         user_id: 1,
       },
     };
-    const res = {
-      status: jest.fn().mockReturnThis(),
+    res = {
+      status: jest.fn(() => res),
       json: jest.fn(),
     };
+  });
 
-    await historyController.getHistory(req, res);
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-    expect(prisma.historyGame.findMany).toHaveBeenCalledWith({
+  it('should get user history and return success response', async () => {
+    mockPrisma.historyGame.findMany.mockResolvedValue([/* mocked history data */]);
+
+    await getHistory(req, res);
+
+    expect(mockPrisma.historyGame.findMany).toHaveBeenCalledWith({
       where: {
         user_id: 1,
       },
     });
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({
-      meta: {
-        code: '200_003',
-        message: 'succes get data history id',
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      meta: { code: '200_003', message: 'success get data history id' },
+      data: expect.any(Array),
+    }));
+  });
+
+  it('should return empty history if user_id is not provided', async () => {
+    req.params.user_id = undefined;
+
+    await getHistory(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      message: 'play the game to make history',
+      data: [],
+    }));
+  });
+
+  it('should return error response if history retrieval fails', async () => {
+    mockPrisma.historyGame.findMany.mockRejectedValue(new Error('Database error'));
+
+    await getHistory(req, res);
+
+    expect(mockPrisma.historyGame.findMany).toHaveBeenCalledWith({
+      where: {
+        user_id: 1,
       },
-      data: [
-        {
-          id: 1,
-          user_id: 1,
-          result_game: 'win',
-          recent_game: 'Chess',
-          recent_score: 100,
-        },
-      ],
     });
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      meta: { code: '500_002', message: 'Database error' },
+    }));
+  });
+
+  it('should return error response if user history is not found', async () => {
+    mockPrisma.historyGame.findMany.mockResolvedValue([]);
+
+    await getHistory(req, res);
+
+    expect(mockPrisma.historyGame.findMany).toHaveBeenCalledWith({
+      where: {
+        user_id: 1,
+      },
+    });
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      meta: { code: '404_001', message: 'user history not found' },
+    }));
   });
 });

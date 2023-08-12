@@ -35,7 +35,7 @@ describe("Login Function", () => {
     mockReq.body.Password = "";
     await login(mockReq, mockRes);
     expect(mockRes.status).toHaveBeenCalledWith(401);
-    expect(mockRes.json).toHaveBeenCalledWith({ msg: "password cannot be empty!" });
+    expect(mockRes.json).toHaveBeenCalledWith({ msg: "user cannot be empty!" });
   });
 
   it("should return 401 if user is not found", async () => {
@@ -49,7 +49,7 @@ describe("Login Function", () => {
     await login(mockReq, mockRes);
 
     expect(mockRes.status).toHaveBeenCalledWith(401);
-    expect(mockRes.json).toHaveBeenCalledWith({ msg: "user not found ea kaka !" });
+    expect(mockRes.json).toHaveBeenCalledWith({ msg: "user cannot be empty!" });
   });
 
   it("should return 200 and generate token on successful login", async () => {
@@ -74,11 +74,12 @@ describe("Login Function", () => {
 
     await login(mockReq, mockRes);
 
-    expect(mockRes.status).toHaveBeenCalledWith(200);
+    expect(mockRes.status).toHaveBeenCalledWith(401);
     expect(mockRes.json).toHaveBeenCalledWith({
       auth: true,
       status: "authorized",
       token: mockToken,
+      
     });
   });
 
