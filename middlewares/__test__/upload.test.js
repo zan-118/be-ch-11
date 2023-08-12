@@ -1,12 +1,15 @@
 const multer = require("multer");
+// eslint-disable-next-line no-unused-vars
+const uploadMiddleware = require("../upload");
 
 // Mock the multer module
 jest.mock("multer");
 
 describe("Upload Middleware", () => {
-  // Mock the multer module
+  // You've already added this part to mock the multer module
   jest.mock("multer");
 
+  // Add the new test cases here
   it("should correctly set the destination for uploaded files", () => {
     // Mock functions and objects
     const mockCb = jest.fn();
@@ -54,4 +57,6 @@ describe("Upload Middleware", () => {
     // Assert that the file filter function rejected the invalid file
     expect(mockCb).toHaveBeenCalledWith(expect.any(Error));
   });
+
+  // ... other test cases you may have ...
 });
