@@ -18,6 +18,6 @@ router.use("/history", History);
 router.post("/auth/login", login);
 
 // upload router
-router.post("/upload", upload.single("data-binary"), dataImg.uploadImage);
+router.post("/upload/:id", upload.single("data-binary"), dataImg.uploadImage);
 
 module.exports = router;
