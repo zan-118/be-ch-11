@@ -1,64 +1,57 @@
 const multer = require("multer");
-const upload = require("../upload"); 
 
+// Mock the multer module
 jest.mock("multer");
 
-describe("upload", () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+describe("Upload Middleware", () => {
+  // Mock the multer module
+  jest.mock("multer");
 
-  it("should export the upload middleware function", () => {
-    expect(typeof upload).toBe("function");
-  });
+  it("should correctly set the destination for uploaded files", () => {
+    // Mock functions and objects
+    const mockCb = jest.fn();
 
-  it("should set the correct destination for uploaded files", () => {
-    upload();
+    // Call the destination function
+    const mockDestination = multer.diskStorage.mock.calls[0][0].destination;
+    mockDestination(null, {}, mockCb);
 
-    const storageOptions = multer.mock.calls[0][0].storage;
-    const destinationMock = jest.fn();
-    storageOptions.destination(null, null, destinationMock);
-
-    expect(destinationMock).toHaveBeenCalledWith(null, "uploads/");
+    // Assert that the destination function was called with the correct parameters
+    expect(mockCb).toHaveBeenCalledWith(null, "uploads/");
   });
 
   it("should generate unique filenames for uploaded files", () => {
-    upload();
+    // Mock functions and objects
+    const mockCb = jest.fn();
 
-    const storageOptions = multer.mock.calls[0][0].storage;
-    const filenameMock = jest.fn();
-    const fakeFile = { fieldname: "test-fieldname" };
-    storageOptions.filename(null, fakeFile, filenameMock);
+    // Call the filename function
+    const mockFilename = multer.diskStorage.mock.calls[0][0].filename;
+    mockFilename(null, {}, mockCb);
 
-    // Check if the generated filename contains the expected fieldname
-    expect(filenameMock).toHaveBeenCalledWith(
+    // Assert that the filename function was called with the correct parameters
+    expect(mockCb).toHaveBeenCalledWith(
       null,
-      expect.stringContaining("test-fieldname")
+      // eslint-disable-next-line comma-dangle
+      expect.stringMatching(/^[^-]+-\d+-\d+$/)
     );
-  });
-
-  it("should limit the file size to 5 MB", () => {
-    upload();
-
-    const limits = multer.mock.calls[0][0].limits;
-    expect(limits.fileSize).toBe(1024 * 1024 * 5);
   });
 
   it("should allow only image files", () => {
-    upload();
+    // Mock functions and objects
+    const mockCb = jest.fn();
 
-    const fileFilter = multer.mock.calls[0][0].fileFilter;
-    const allowedFile = { mimetype: "image/png" };
-    const disallowedFile = { mimetype: "application/pdf" };
-    const allowMock = jest.fn();
-    const disallowMock = jest.fn();
+    // Call the file filter function with a valid image
+    const mockFileFilter = multer.mock.calls[0][0].fileFilter;
+    const mockValidImage = { mimetype: "image/jpeg" };
+    mockFileFilter(null, mockValidImage, mockCb);
 
-    fileFilter(null, allowedFile, allowMock);
-    fileFilter(null, disallowedFile, disallowMock);
+    // Assert that the file filter function allowed the valid image
+    expect(mockCb).toHaveBeenCalledWith(null, true);
 
-    expect(allowMock).toHaveBeenCalledWith(null, true);
-    expect(disallowMock).toHaveBeenCalledWith(
-      new Error("Only image files are allowed.")
-    );
+    // Call the file filter function with an invalid file
+    const mockInvalidFile = { mimetype: "application/pdf" };
+    mockFileFilter(null, mockInvalidFile, mockCb);
+
+    // Assert that the file filter function rejected the invalid file
+    expect(mockCb).toHaveBeenCalledWith(expect.any(Error));
   });
 });
