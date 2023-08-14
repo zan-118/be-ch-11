@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>3/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>3/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -96,22 +96,22 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -122,23 +122,23 @@ const multer = require("multer");
 &nbsp;
 const upload = multer({
   storage: multer.diskStorage({
-<span class="fstat-no" title="function not covered" >    de</span>stination(req, file, cb) {
-<span class="cstat-no" title="statement not covered" >      cb(null, "uploads/"); </span>// Specify the destination directory for uploaded files
+    destination(req, file, cb) {
+      cb(null, "uploads/"); // Specify the destination directory for uploaded files
     },
-<span class="fstat-no" title="function not covered" >    fi</span>lename(req, file, cb) {
-      const uniqueSuffix = <span class="cstat-no" title="statement not covered" >`${Date.now()}-${Math.round(Math.random() * 1e9)}`;</span>
-<span class="cstat-no" title="statement not covered" >      cb(null, `${file.fieldname}-${uniqueSuffix}`); </span>// Define the file naming convention
+    filename(req, file, cb) {
+      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+      cb(null, `${file.fieldname}-${uniqueSuffix}`); // Define the file naming convention
     },
   }),
   limits: {
     fileSize: 1024 * 1024 * 5, // Limit the file size to 5 MB (adjust as needed)
   },
-<span class="fstat-no" title="function not covered" >  fi</span>leFilter(req, file, cb) {
+  fileFilter(req, file, cb) {
     // Validate file types (e.g., accept only image files)
-<span class="cstat-no" title="statement not covered" >    if (file.mimetype.startsWith("image/")) {</span>
-<span class="cstat-no" title="statement not covered" >      cb(null, true);</span>
+    if (file.mimetype.startsWith("image/")) {
+      cb(null, true);
     } else {
-<span class="cstat-no" title="statement not covered" >      cb(new Error("Only image files are allowed."));</span>
+      cb(new Error("Only image files are allowed."));
     }
   },
 });
@@ -151,7 +151,7 @@ module.exports = upload;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-08-12T08:47:45.210Z
+                at 2023-08-12T13:23:10.705Z
             </div>
         <script src="../prettify.js"></script>
         <script>
