@@ -1,75 +1,121 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
-const request = require("supertest");
 const { PrismaClient } = require("@prisma/client");
-const app = require("../app"); // Replace with the path to your Express app setup
 
-jest.mock("@prisma/client");
-jest.mock("../Game.controller.js", () => ({
-  createRoom: jest.fn().mockResolvedValue({
-    Name: "test",
-    Description: "test_desc",
-    thumbnail_url: "test_url",
-    // ...
-  }),
-}));
-describe("Game Controller", () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+const prisma = new PrismaClient();
 
-  it("should create a room and return success message", async () => {
-    // Set up your mocked PrismaClient and create mockResolvedValue
+const createRoom = async (req, res) => {
+  const { Name, Description, thumbnail_url, Game_url, play_count } = req.body;
 
-    // Mock PrismaClient methods for create
-    const mockCreate = jest
-      .fn()
-      .mockResolvedValue({ id: 1, Name: "Test Room" });
-    PrismaClient.prototype.game = {
-      create: mockCreate,
-    };
-
-    const response = await request(app).post("/create-room").send({
-      Name: "Test Room",
-      Description: "Test description",
-      thumbnail_url: "test_thumbnail.jpg",
-      Game_url: "test_game_url",
-      play_count: 0,
+  try {
+    const room = await prisma.game.create({
+      data: {
+        Name,
+        Description,
+        thumbnail_url,
+        Game_url,
+        play_count,
+      },
     });
 
-    // Assert the response
-    expect(response.status).toBe(202);
-    expect(response.body.message).toBe("success create room ");
-    expect(response.body.data).toEqual({ id: 1, Name: "Test Room" });
+    if (!room) {
+      return res.status(401).json({
+        message: "cannot be empty",
+      });
+    }
+    return res.status(202).json({
+      message: "success create room ",
+      data: room,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
-    // Optionally, assert that the PrismaClient methods were called
-    expect(mockCreate).toHaveBeenCalled();
-  });
+async function getRooms(req, res, next) {
+  try {
+    const rooms = await prisma.game.findMany();
+    if (!rooms) {
+      return res.status(400).json({
+        result: "error",
+        message: "Tidak ada rooms",
+      });
+    }
+    return res.status(200).json({
+      result: "Success",
+      rooms,
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+async function getRoomById(req, res, next) {
+  const { id } = req.params;
+  try {
+    const games = await prisma.game.findUnique({
+      where: { id },
+    });
+    if (!games) {
+      return res.status(400).json({
+        result: "room not found!",
+      });
+    }
+    return res
+      .status(200)
+      .json({ message: "success get room by id", data: games });
+  } catch (error) {
+    return next(error);
+  }
+}
 
-  it("should get rooms and return success result", async () => {
-    // Set up your mocked PrismaClient and create mockResolvedValue
+const updateScore = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const getData = await prisma.game.findUnique({
+      where: {
+        id,
+      },
+    });
+    // eslint-disable-next-line no-plusplus
+    const visitedRoom = ++getData.play_count;
+    const data = await prisma.game.update({
+      where: {
+        id,
+      },
+      data: {
+        play_count: visitedRoom,
+      },
+    });
+    res
+      .status(200)
+      .json({ msg: "success update rooms !", data: data.play_count });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
-    // Mock PrismaClient methods for findMany
-    const mockFindMany = jest.fn().mockResolvedValue([
-      { id: 1, Name: "Room 1" },
-      { id: 2, Name: "Room 2" },
-    ]);
-    PrismaClient.prototype.game = {
-      findMany: mockFindMany,
-    };
+// const bulkCreateGames = () => {
+//   try {
+//   } catch (error) {}
+// };
 
-    const response = await request(app).get("/get-rooms");
-
-    // Assert the response
-    expect(response.status).toBe(200);
-    expect(response.body.result).toBe("Success");
-    expect(response.body.rooms).toEqual([
-      { id: 1, Name: "Room 1" },
-      { id: 2, Name: "Room 2" },
-    ]);
-
-    // Optionally, assert that the PrismaClient methods were called
-    expect(mockFindMany).toHaveBeenCalled();
-  });
-
-  // Repeat similar test cases for other functions (getRoomById, updateScore)...
-});
+// const deleteAllGames = async (req, res) => {
+//   try {
+//     const deletAll = await prisma.game.deleteMany({});
+//     res.status(200).json({ msg: "sucess delete all" });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+// const bulkCreate = async (req, res) => {
+//   try {
+//     const create = await prisma.game.createMany({});
+//     res.status(200).json({ msg: "data created 10" });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+module.exports = {
+  createRoom,
+  getRooms,
+  getRoomById,
+  updateScore,
+};
