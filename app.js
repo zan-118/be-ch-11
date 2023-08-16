@@ -7,7 +7,7 @@ require("dotenv").config();
 const app = express();
 const handleCors = require("./middlewares/cors");
 
-const { PORT } = process.env;
+const PORT = 3000;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static("./views"));
@@ -21,6 +21,8 @@ app.get("/", (req, res) => {
 
 app.use("/", routes); // localhost:<PORT>
 
-app.listen(PORT, () => {
-  console.log(`server sudah connect di http://localhost:${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`server sudah connect di http://localhost:${PORT}`);
+// });
+
+module.exports = app

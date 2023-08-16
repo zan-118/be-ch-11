@@ -22,7 +22,7 @@ async function login(req, res) {
     if (!compare) {
       return res
         .status(200)
-        .json({ auth: false, message: "password doesnt match" });
+        .json({ auth: false, message: "password doesnt match"});
     }
     const token = jwt.sign(
       {

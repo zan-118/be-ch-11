@@ -8,6 +8,24 @@ const register = async (req, res) => {
   const { Email, Username, Password, Total_score, Biodata, City, image_url } =
     req.body;
   try {
+    if (!Email || !Username) {
+      return res.status(404).json({
+        result: "Failed",
+        message: "username or email cannot empty",
+      });
+    }
+    if (!Email || !Username) {
+      return res.status(404).json({
+        result: "Failed",
+        message: "username or email cannot empty",
+      });
+    }
+    if (!Password) {
+      return res.status(404).json({
+        result: "Failed",
+        message: "password cannot be empty",
+      });
+    }
     const hashedPassword = await bcrypt.hash(Password, 12);
     // eslint-disable-next-line no-unused-vars
     const player = await prisma.user.create({
@@ -22,18 +40,6 @@ const register = async (req, res) => {
       },
     });
     // validasi body kosong
-    if (!Email || !Username) {
-      return res.status(404).json({
-        result: "Failed",
-        message: "username or email cannot empty",
-      });
-    }
-    if (!Password) {
-      return res.status(404).json({
-        result: "Failed",
-        message: "password cannot be empty",
-      });
-    }
     return res.status(200).json({
       message: "success create data !",
     });
